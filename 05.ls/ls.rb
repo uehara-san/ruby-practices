@@ -1,18 +1,12 @@
 # frozen_string_literal: true
 
 class ListSegments
-  attr_accessor :sorted_lists
-
   LISTS = Dir.glob('*', base: ARGV[0])
   NUMBER_OF_COLUMN = 3.0
   NUMBER_OF_ROW = (LISTS.count / NUMBER_OF_COLUMN).ceil
 
   def max_length
-    longest = 0
-    LISTS.each do |file|
-      longest = file.length if longest < file.length
-    end
-    longest
+    LISTS.max_by(&:length).length
   end
 
   def transform
@@ -38,7 +32,7 @@ class ListSegments
     column = 0
     @sorted_lists.each do |file|
       column += 1
-      if (column % NUMBER_OF_COLUMN).zero?
+      if (column % NUMBER_OF_COLUMN).zero? || LISTS.count == 4 && column == 2
         print "#{file}\n"
         column = 0
       else
