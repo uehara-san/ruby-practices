@@ -1,42 +1,44 @@
+#!/usr/bin/env ruby
 # frozen_string_literal: true
 
 class ListSegments
-  LISTS = Dir.glob('*', base: ARGV[0])
-  NUMBER_OF_COLUMN = 3.0
-  NUMBER_OF_ROW = (LISTS.count / NUMBER_OF_COLUMN).ceil
+  LISTS = Dir.glob('*')
+  COLUMN = 3.0
+  ROW = (LISTS.count / COLUMN).ceil
 
   def max_length
     LISTS.max_by(&:length).length
   end
 
   def transform
-    sliced_lists = []
-    @sorted_lists = []
+    split_lists = []
+    LISTS.each_slice(ROW) { |file| split_lists << file }
 
-    LISTS.each_slice(NUMBER_OF_ROW) { |file| sliced_lists << file }
+    split_lists << [''] if split_lists.count < COLUMN
 
-    row = 0
-    while row < NUMBER_OF_ROW
-      sliced_lists.each do |file|
-        @sorted_lists << if file[row].nil?
-                           ' '
-                         else
-                           file[row]
-                         end
+    @formatted_lists = []
+    index = 0
+    while index < ROW
+      split_lists.each do |file|
+        @formatted_lists << if file[index].nil?
+                              ''
+                            else
+                              file[index]
+                            end
       end
-      row += 1
+      index += 1
     end
   end
 
   def output
-    column = 0
-    @sorted_lists.each do |file|
-      column += 1
-      if (column % NUMBER_OF_COLUMN).zero? || LISTS.count == 4 && column == 2
-        print "#{file}\n"
-        column = 0
+    count = 1
+    @formatted_lists.each do |file|
+      if count == COLUMN
+        puts file.ljust(max_length)
+        count = 1
       else
-        print "#{file.ljust(max_length)}  "
+        print "#{file.ljust(max_length)} "
+        count += 1
       end
     end
   end
